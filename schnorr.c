@@ -1,10 +1,13 @@
+#include <stdlib.h>
 #include "params.h"
 #include "schnorr.h"
+#include "math.h"
 
 void key_gen(long *x, long *y) {
 
     // Generate a random private key x in the range [0, Q-1]
     *x = rand() % Q;
+
     // Compute the public key y = g^x mod p
     *y = mod_exp(G, *x, P);
 
@@ -24,7 +27,7 @@ Signature schnorr_sign(long x, long m) {
     long e = (sig.R + m) % Q;
 
     // Step 4: Compute s = (k - x * e) mod Q
-    sig.s = (k - x * e) % Q;
+    sig.s = (k + x * e) % Q;
 
     return sig;
 
@@ -39,7 +42,7 @@ int schnorr_verify(long y, long m, Signature sig) {
     long LHS = mod_exp(G, sig.s, P);
 
     // Compute R * y^e
-    long RHS = (mod_exp(y, e, P) * mod_exp(sig.R, 1, P)) % P;
+    long RHS = (sig.R * mod_exp(y, e, P)) % P;
 
     // Step 3: Verify  g^s == R * y^e mod p
     return (LHS == RHS);

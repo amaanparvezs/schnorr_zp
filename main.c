@@ -9,7 +9,7 @@ int main() {
     // (Private Key, Public Key) : (x, y)
     long x, y;
 
-    keygen(&x, &y);
+    key_gen(&x, &y);
 
     printf("Private Key (x): %ld\n", x);
     printf("Public Key (y): %ld\n", y);
