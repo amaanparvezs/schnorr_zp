@@ -3,6 +3,7 @@
 #include<time.h>
 #include "schnorr.h"
 #include "params.h"
+#include "tests.h"
 
 int main() {
     srand(time(NULL));
@@ -35,6 +36,8 @@ int main() {
     } else {
         printf("Signature is invalid.\n");
     }
+
+    run_all_tests(x, y, message);
 
     return 0;
 
