@@ -2,17 +2,19 @@
 #include<stdlib.h>
 #include<time.h>
 #include "schnorr.h"
+#include "params.h"
 
 int main() {
     srand(time(NULL));
+
+    printf("=== Schnorr Signature Scheme ===\n");
+    printf("=== Toy Implementation ===\n");
+    printf("Public Parameters: p = %ld, q = %ld, g = %ld\n", P, Q, G);
 
     // (Private Key, Public Key) : (x, y)
     long x, y;
 
     key_gen(&x, &y);
-
-    printf("Private Key (x): %ld\n", x);
-    printf("Public Key (y): %ld\n", y);
 
     // Message to sign
     long message;

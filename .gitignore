@@ -1,0 +1,11 @@
+# Binaries
+schnorr
+main
+*.out
+*.o
+
+# macOS junk
+.DS_Store
+
+# Future build directory
+build/

@@ -1,3 +1,3 @@
-#define P 23   // prime modulus
-#define Q 11   // subgroup order
-#define G 2    // generator
+#define P 23l   // prime modulus
+#define Q 11l   // subgroup order
+#define G 2l    // generator
