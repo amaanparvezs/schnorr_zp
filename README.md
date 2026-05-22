@@ -1,109 +1,117 @@
-# Schnorr Signature Scheme over Z_p (Toy Implementation)
+# Schnorr Signature Scheme over Zp (Toy Implementation)
 
 ## Overview
 
-This repository contains a **toy educational implementation** of the Schnorr Digital Signature Scheme over a finite field subgroup of (\mathbb{Z}_p^*).
+This repository contains a toy educational implementation of the Schnorr Digital Signature Scheme over a finite field subgroup of `Zp*`.
 
-The implementation demonstrates the core ideas behind:
+The project demonstrates the core ideas behind:
 
-* Key Generation
-* Schnorr Identification intuition
-* Fiat–Shamir transformation
-* Signature generation
-* Signature verification
-* Modular arithmetic in finite groups
+- Key Generation
+- Schnorr Signatures
+- Fiat–Shamir Transformation
+- Modular Arithmetic
+- Signature Verification
+- Challenge–Response Protocols
 
-This project is intended for:
+This implementation is intended for:
 
-* learning cryptographic protocols,
-* understanding Schnorr signatures mathematically,
-* experimenting with small finite groups,
-* educational demonstrations.
+- learning cryptographic protocols,
+- understanding Schnorr signatures mathematically,
+- experimenting with finite groups,
+- educational demonstrations.
 
-It is **NOT production secure** and must not be used for real cryptographic applications.
+This is **NOT production secure** and must not be used in real-world cryptographic systems.
 
 ---
 
 # Mathematical Background
 
-We work in a subgroup of (\mathbb{Z}_p^*):
+We work in a subgroup of `Zp*` with:
 
-* Prime modulus: (p = 23)
-* Subgroup order: (q = 11)
-* Generator: (g = 2)
+```text
+p = 23
+q = 11
+g = 2
+```
 
-The public key is:
+Where:
 
-[
-y = g^x \mod p
-]
+- `p` is a prime modulus
+- `q` is the subgroup order
+- `g` is a generator of the subgroup
+
+The public key is computed as:
+
+```text
+y = g^x mod p
+```
 
 where:
 
-* (x) is the secret key,
-* (y) is the public key.
+- `x` = secret key
+- `y` = public key
 
 ---
 
-# Schnorr Signature Flow
+# Schnorr Signature Scheme
 
 ## Key Generation
 
-Choose secret key:
+Choose a secret key:
 
-[
-x \xleftarrow{$} \mathbb{Z}_q
-]
+```text
+x <- Zq
+```
 
-Compute public key:
+Compute the public key:
 
-[
-y = g^x \mod p
-]
+```text
+y = g^x mod p
+```
 
 ---
 
 ## Signing
 
-Given a message (m):
+Given a message `m`:
 
 ### Step 1 — Choose random nonce
 
-[
-k \xleftarrow{$} \mathbb{Z}_q
-]
+```text
+k <- Zq
+```
 
 ### Step 2 — Compute commitment
 
-[
-R = g^k \mod p
-]
+```text
+R = g^k mod p
+```
 
 ### Step 3 — Compute challenge
 
 In this toy implementation:
 
-[
+```text
 e = H(R, m)
-]
+```
 
 implemented as:
 
-[
-e = (R + m) \mod q
-]
+```text
+e = (R + m) mod q
+```
 
 ### Step 4 — Compute response
 
-[
-s = k + ex \mod q
-]
+```text
+s = k + ex mod q
+```
 
-Signature:
+The signature is:
 
-[
+```text
 (R, s)
-]
+```
 
 ---
 
@@ -111,15 +119,36 @@ Signature:
 
 Recompute:
 
-[
+```text
 e = H(R, m)
-]
+```
 
 Accept iff:
 
-[
-g^s \equiv R \cdot y^e \pmod p
-]
+```text
+g^s mod p == R * y^e mod p
+```
+
+---
+
+# Why Verification Works
+
+Since:
+
+```text
+s = k + ex
+```
+
+we get:
+
+```text
+g^s
+= g^(k + ex)
+= g^k * (g^x)^e
+= R * y^e
+```
+
+which matches the verifier equation.
 
 ---
 
@@ -164,53 +193,37 @@ Run:
 
 ---
 
-# Example Verification Equation
+# Example Output
 
-The verifier checks:
+```text
+Secret Key x = 7
+Public Key y = 13
 
-[
-g^s \stackrel{?}{=} R \cdot y^e \pmod p
-]
+Message m = 5
 
-Using:
+Random nonce k = 3
+Commitment R = 8
 
-[
-s = k + ex
-]
+Challenge e = 2
 
-we get:
+Response s = 6
 
-[
-g^s = g^{k + ex}
-]
-
-[
-= g^k \cdot (g^x)^e
-]
-
-[
-= R \cdot y^e
-]
-
-which proves correctness.
+Verification Successful
+```
 
 ---
 
-# Important Security Note
+# Security Notes
 
 This implementation is intentionally simplified and should only be used for educational purposes.
 
-## Not Production Secure
-
-The implementation omits several requirements necessary for real-world cryptographic security.
-
-### 1. Tiny Parameters
+## 1. Tiny Parameters
 
 The parameters:
 
-```c
-P = 23
-Q = 11
+```text
+p = 23
+q = 11
 ```
 
 are extremely small and trivially breakable.
@@ -219,7 +232,7 @@ Real Schnorr implementations use large secure groups.
 
 ---
 
-### 2. Non-Cryptographic Randomness
+## 2. Non-Cryptographic Randomness
 
 The implementation uses:
 
@@ -233,24 +246,24 @@ Real implementations require a CSPRNG.
 
 ---
 
-### 3. Toy Hash Function
+## 3. Toy Hash Function
 
-The challenge:
+The challenge is computed as:
 
-```c
-e = (R + m) % Q
+```text
+e = (R + m) mod q
 ```
 
-is not secure.
+which is NOT cryptographically secure.
 
-Real Schnorr signatures use cryptographic hash functions such as:
+Real implementations use secure hash functions such as:
 
-* SHA-256
-* SHA-512
-* BLAKE2
-* SHAKE
+- SHA-256
+- SHA-512
+- SHAKE
+- BLAKE2
 
-Example:
+For example:
 
 ```text
 e = SHA256(R || m) mod q
@@ -258,20 +271,77 @@ e = SHA256(R || m) mod q
 
 ---
 
-### 4. No Serialization / Domain Separation
+## 4. No Constant-Time Protection
 
-Real signature schemes require:
-
-* canonical encodings,
-* transcript separation,
-* byte-level hashing,
-* domain separation tags.
+This implementation is vulnerable to timing and side-channel attacks.
 
 ---
 
-### 5. No Constant-Time Protection
+## 5. No Serialization or Domain Separation
 
-This implementation is vulnerable to timing and side-channel attacks.
+Real-world signature schemes require:
+
+- canonical encodings,
+- transcript separation,
+- byte-level hashing,
+- domain separation tags.
+
+---
+
+# What This Project Demonstrates Correctly
+
+Despite being a toy implementation, the repository correctly demonstrates:
+
+- Schnorr signing equations
+- Fiat–Shamir intuition
+- Challenge–response structure
+- Subgroup arithmetic
+- Signature verification correctness
+- Relation between identification schemes and signatures
+
+The implementation logic itself is mathematically correct.
+
+---
+
+# Suggested Improvements
+
+## High Priority
+
+- Replace toy hash with SHA-256
+- Replace `rand()` with secure randomness
+- Add subgroup membership checks
+- Add deterministic nonce generation
+- Add serialization utilities
+
+---
+
+## Medium Priority
+
+- Add invalid signature tests
+- Add malformed input tests
+- Add negative test cases
+- Add transcript abstraction
+
+---
+
+## Advanced Improvements
+
+- Implement Schnorr over elliptic curves
+- Add benchmark utilities
+- Add formal EUF-CMA discussion
+- Add transcript hashing API
+- Add deterministic signing
+- Add elliptic curve variant comparison
+
+---
+
+# Educational References
+
+- Claus Schnorr — Identification and Signature Schemes
+- Fiat–Shamir Transformation
+- Schnorr Identification Protocol
+- Sigma Protocols
+- EUF-CMA Security Model
 
 ---
 
@@ -279,4 +349,4 @@ This implementation is vulnerable to timing and side-channel attacks.
 
 This repository is an educational toy implementation created for learning and experimentation.
 
-Do not use this code in production systems, wallets, authentication systems, or security-critical environments.
+Do not use this code in production systems, authentication systems, wallets, or security-critical applications.
